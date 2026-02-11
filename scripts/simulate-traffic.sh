@@ -195,7 +195,8 @@ while true; do
   if [[ $((RANDOM % 100)) -lt "${READS_RATE}" ]]; then
     request GET "/accounts/accounts/${account_id}" >/dev/null
     request GET "/catalog/products?category=${category}" >/dev/null
-    request GET "/identity/users?email=${email}" >/dev/null
+    request GET "/catalog/products/all" >/dev/null
+    request GET "/identity/users" >/dev/null
     maybe_bad && request GET "/accounts/accounts/not-a-real-id" >/dev/null
   fi
 done

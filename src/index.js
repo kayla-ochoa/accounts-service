@@ -50,6 +50,27 @@ function applyCredit(accountId, amount) {
   return next;
 }
 
+/**
+ * POST /accounts
+ * Creates an account for an existing user.
+ * Request body:
+ * {
+ *   "userId": "u123",
+ *   "type": "standard" // optional, defaults to "standard"
+ * }
+ * Response 201:
+ * {
+ *   "account": {
+ *     "id": "a1",
+ *     "userId": "u123",
+ *     "type": "standard",
+ *     "createdAt": "2026-02-11T10:00:00.000Z"
+ *   }
+ * }
+ * Errors:
+ * 400 { "error": "userId is required" }
+ * 4xx/5xx { "error": "<identity service error>" }
+ */
 app.post("/accounts", async (req, res) => {
   try {
     const { userId, type = "standard" } = req.body || {};
@@ -65,6 +86,22 @@ app.post("/accounts", async (req, res) => {
   }
 });
 
+/**
+ * GET /accounts/:id
+ * Fetches an account by id along with its balance.
+ * Response 200:
+ * {
+ *   "account": {
+ *     "id": "a1",
+ *     "userId": "u123",
+ *     "type": "standard",
+ *     "createdAt": "2026-02-11T10:00:00.000Z"
+ *   },
+ *   "balance": 42
+ * }
+ * Errors:
+ * 404 { "error": "account not found" }
+ */
 app.get("/accounts/:id", (req, res) => {
   const account = accountsById.get(req.params.id);
   if (!account) {
@@ -74,6 +111,18 @@ app.get("/accounts/:id", (req, res) => {
   return res.json({ account, balance });
 });
 
+/**
+ * GET /accounts?userId=:userId
+ * Lists accounts for a user.
+ * Response 200:
+ * {
+ *   "accounts": [
+ *     { "id": "a1", "userId": "u123", "type": "standard", "createdAt": "2026-02-11T10:00:00.000Z" }
+ *   ]
+ * }
+ * Errors:
+ * 400 { "error": "userId query is required" }
+ */
 app.get("/accounts", (req, res) => {
   const { userId } = req.query || {};
   if (!userId) {
@@ -83,6 +132,17 @@ app.get("/accounts", (req, res) => {
   return res.json({ accounts });
 });
 
+/**
+ * POST /accounts/:id/credit
+ * Applies a credit to an account balance (positive or negative).
+ * Request body:
+ * { "amount": 25 }
+ * Response 200:
+ * { "accountId": "a1", "balance": 67 }
+ * Errors:
+ * 400 { "error": "amount must be a number" }
+ * 404 { "error": "account not found" }
+ */
 app.post("/accounts/:id/credit", (req, res) => {
   const account = accountsById.get(req.params.id);
   if (!account) {
@@ -96,6 +156,28 @@ app.post("/accounts/:id/credit", (req, res) => {
   return res.json({ accountId: account.id, balance });
 });
 
+/**
+ * POST /accounts/onboard
+ * Creates a user, creates an account, optionally credits it,
+ * and assigns a product via the catalog service.
+ * Request body:
+ * {
+ *   "name": "Ada Lovelace",
+ *   "email": "ada@example.com",
+ *   "productId": "p123",
+ *   "initialCredit": 100 // optional, defaults to 0
+ * }
+ * Response 201:
+ * {
+ *   "user": { "id": "u123", "name": "Ada Lovelace", "email": "ada@example.com" },
+ *   "account": { "id": "a1", "userId": "u123", "type": "standard", "createdAt": "2026-02-11T10:00:00.000Z" },
+ *   "assignment": { "id": "as1", "productId": "p123", "accountId": "a1" },
+ *   "balance": 100
+ * }
+ * Errors:
+ * 400 { "error": "name, email, and productId are required" }
+ * 4xx/5xx { "error": "<identity/catalog service error>" }
+ */
 app.post("/accounts/onboard", async (req, res) => {
   try {
     const { name, email, productId, initialCredit = 0 } = req.body || {};
@@ -139,6 +221,12 @@ app.post("/accounts/onboard", async (req, res) => {
   }
 });
 
+/**
+ * GET /health
+ * Basic service health check.
+ * Response 200:
+ * { "status": "ok", "service": "accounts-api" }
+ */
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", service: "accounts-api" });
 });
