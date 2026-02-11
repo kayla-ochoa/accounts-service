@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: identity-api
+  namespace: accounts
+spec:
+  type: ExternalName
+  externalName: identity-api.identity.svc.cluster.local
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: catalog-api
+  namespace: accounts
+spec:
+  type: ExternalName
+  externalName: catalog-api.catalog.svc.cluster.local
