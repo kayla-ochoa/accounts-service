@@ -43,9 +43,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      # Install the Postman CLI globally via npm
+      # Install the Postman CLI using shell script
       - name: Install Postman CLI
-        run: npm install -g @postman/cli
+        run: curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
       
       # Authenticate with Postman using API key stored in GitHub secrets
       # This is required for the CLI to access Postman features
@@ -120,9 +120,9 @@ jobs:
           # Verify accounts service is running
           curl --retry 5 --retry-delay 1 --retry-connrefused http://localhost:3002/health || echo "Accounts service health check skipped"
       
-      # Install the Postman CLI globally
+      # Install the Postman CLI using shell script
       - name: Install Postman CLI
-        run: npm install -g @postman/cli
+        run: curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
       
       # Authenticate with Postman
       - name: Login to Postman
