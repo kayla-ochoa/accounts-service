@@ -1,0 +1,38 @@
+# Sync to Postman Cloud Workflow
+# This workflow automatically syncs local Postman workspace contents to the cloud
+# when pull requests are merged to the main branch.
+
+name: Sync to Postman Cloud
+
+# Trigger on push to main branch (this captures PR merges)
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync:
+    name: Sync Workspace to Cloud
+    runs-on: ubuntu-latest
+
+    # Set environment variables from secrets
+    env:
+      POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
+
+    steps:
+      # Step 1: Checkout the repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Install Postman CLI using the official installation script
+      - name: Install Postman CLI
+        run: curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
+
+      # Step 3: Authenticate with Postman using API key
+      - name: Login to Postman
+        run: postman login --with-api-key "$POSTMAN_API_KEY"
+
+      # Step 4: Push local workspace contents to Postman Cloud
+      # The --yes flag auto-confirms the push operation
+      - name: Push to Postman Cloud
+        run: postman workspace push --yes
