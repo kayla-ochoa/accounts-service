@@ -110,7 +110,7 @@ jobs:
       # Start the accounts service in the background
       # It will use the environment variables defined above to connect to mocks
       - name: Start accounts service
-        run: node index.js &
+        run: node src/index.js &
       
       # Wait for accounts service to be ready
       - name: Wait for accounts service to be ready
