@@ -1,0 +1,24 @@
+name: Sync to Postman Cloud
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync-to-postman:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Postman CLI
+        run: |
+          curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
+
+      - name: Login to Postman
+        run: postman login --with-api-key ${{ secrets.POSTMAN_API_KEY }}
+
+      - name: Push changes to Postman Cloud
+        run: postman workspace push --yes
