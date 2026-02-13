@@ -55,7 +55,7 @@ jobs:
       # Lint the OpenAPI specification file
       # This checks for syntax errors, missing required fields, and best practices
       - name: Lint OpenAPI spec
-        run: postman spec lint postman/specs/index.yaml
+        run: postman spec lint postman/specs/index.yaml --report-events
 
   # =============================================================================
   # Job 2: Run API Tests
@@ -131,4 +131,4 @@ jobs:
       # Run the Postman collection tests against the running services
       # This executes all requests in the collection and validates responses
       - name: Run API tests
-        run: postman collection run "postman/collections/Accounts API.postman_collection.json" --env-var "baseUrl=http://localhost:3002"
+        run: postman collection run "postman/collections/Accounts API.postman_collection.json" --env-var "baseUrl=http://localhost:3002" --report-events
