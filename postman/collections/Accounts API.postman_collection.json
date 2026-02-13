@@ -56,7 +56,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n\t\"userId\": \"user-123\",\n\t\"type\": \"standard\"\n}",
+					"raw": "{\n\t\"userId\": \"u1\",\n\t\"type\": \"standard\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -125,7 +125,7 @@
 					"variable": [
 						{
 							"key": "id",
-							"value": "account-123",
+							"value": "a1",
 							"description": "The account ID"
 						}
 					]
@@ -234,7 +234,7 @@
 					"variable": [
 						{
 							"key": "id",
-							"value": "account-123",
+							"value": "a1",
 							"description": "The account ID"
 						}
 					]

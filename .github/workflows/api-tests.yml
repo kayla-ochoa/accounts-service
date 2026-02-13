@@ -71,8 +71,8 @@ jobs:
     # These override the default Docker service names to point to localhost
     # since the mock servers run locally in CI
     env:
-      IDENTITY_API_URL: http://localhost:3001  # Points to mock identity-api
-      CATALOG_API_URL: http://localhost:3003   # Points to mock catalog-api
+      IDENTITY_BASE_URL: http://localhost:3001  # Points to mock identity-api
+      CATALOG_BASE_URL: http://localhost:3003   # Points to mock catalog-api
       PORT: 3002                                # Port for accounts service
     
     steps:
