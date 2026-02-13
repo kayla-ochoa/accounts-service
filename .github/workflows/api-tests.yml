@@ -1,0 +1,134 @@
+# GitHub Actions workflow for API testing
+# 
+# SETUP INSTRUCTIONS:
+# 1. Go to your GitHub repository → Settings → Secrets and variables → Actions
+# 2. Click "New repository secret"
+# 3. Name: POSTMAN_API_KEY
+# 4. Value: Your Postman API key (get it from https://go.postman.co/settings/me/api-keys)
+# 5. Click "Add secret"
+#
+# This workflow runs on:
+# - Pull requests to main (opened, updated, or reopened)
+# - Direct pushes/merges to main branch
+
+name: API Tests
+
+on:
+  # Trigger on pull requests targeting main branch
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+  
+  # Trigger on push/merge to main branch
+  push:
+    branches:
+      - main
+
+jobs:
+  # =============================================================================
+  # Job 1: Lint OpenAPI Specification
+  # =============================================================================
+  # Validates the OpenAPI spec file for correctness and best practices
+  # This runs first to catch spec issues before running expensive tests
+  lint-spec:
+    name: Lint OpenAPI Spec
+    runs-on: ubuntu-latest
+    
+    steps:
+      # Checkout the repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      # Install the Postman CLI globally via npm
+      - name: Install Postman CLI
+        run: npm install -g @postman/cli
+      
+      # Authenticate with Postman using API key stored in GitHub secrets
+      # This is required for the CLI to access Postman features
+      - name: Login to Postman
+        run: postman login --with-api-key ${{ secrets.POSTMAN_API_KEY }}
+      
+      # Lint the OpenAPI specification file
+      # This checks for syntax errors, missing required fields, and best practices
+      - name: Lint OpenAPI spec
+        run: postman spec lint postman/specs/index.yaml
+
+  # =============================================================================
+  # Job 2: Run API Tests
+  # =============================================================================
+  # Starts mock dependencies and the accounts service, then runs the test collection
+  # Only runs after the lint-spec job passes successfully
+  test-api:
+    name: Run API Tests
+    runs-on: ubuntu-latest
+    needs: lint-spec  # Wait for linting to pass before running tests
+    
+    # Environment variables for the accounts service
+    # These override the default Docker service names to point to localhost
+    # since the mock servers run locally in CI
+    env:
+      IDENTITY_API_URL: http://localhost:3001  # Points to mock identity-api
+      CATALOG_API_URL: http://localhost:3003   # Points to mock catalog-api
+      PORT: 3002                                # Port for accounts service
+    
+    steps:
+      # Checkout the repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      # Setup Node.js environment (required for npm install and running services)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'  # Cache npm dependencies for faster builds
+      
+      # Install project dependencies
+      - name: Install dependencies
+        run: npm install
+      
+      # Start the mock server for identity-api (port 3001) and catalog-api (port 3003)
+      # The & runs it in the background so the workflow can continue
+      - name: Start mock dependencies server
+        run: node postman/mocks/dependencies-mock.js &
+      
+      # Wait for mock servers to be ready
+      # Using curl to check if the servers are responding
+      - name: Wait for mock servers to be ready
+        run: |
+          echo "Waiting for mock servers to start..."
+          sleep 3
+          # Verify identity mock is running
+          curl --retry 5 --retry-delay 1 --retry-connrefused http://localhost:3001/health || echo "Identity mock health check skipped"
+          # Verify catalog mock is running
+          curl --retry 5 --retry-delay 1 --retry-connrefused http://localhost:3003/health || echo "Catalog mock health check skipped"
+      
+      # Start the accounts service in the background
+      # It will use the environment variables defined above to connect to mocks
+      - name: Start accounts service
+        run: node index.js &
+      
+      # Wait for accounts service to be ready
+      - name: Wait for accounts service to be ready
+        run: |
+          echo "Waiting for accounts service to start..."
+          sleep 3
+          # Verify accounts service is running
+          curl --retry 5 --retry-delay 1 --retry-connrefused http://localhost:3002/health || echo "Accounts service health check skipped"
+      
+      # Install the Postman CLI globally
+      - name: Install Postman CLI
+        run: npm install -g @postman/cli
+      
+      # Authenticate with Postman
+      - name: Login to Postman
+        run: postman login --with-api-key ${{ secrets.POSTMAN_API_KEY }}
+      
+      # Run the Postman collection tests against the running services
+      # This executes all requests in the collection and validates responses
+      - name: Run API tests
+        run: postman collection run "postman/collections/Accounts API.postman_collection.json"

@@ -15,6 +15,37 @@
 	"item": [
 		{
 			"name": "Create Account",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('Status code is 201', function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test('Response has account object', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('account');",
+							"});",
+							"",
+							"pm.test('Account has required fields', function () {",
+							"    const account = pm.response.json().account;",
+							"    pm.expect(account).to.have.property('id');",
+							"    pm.expect(account).to.have.property('userId');",
+							"    pm.expect(account).to.have.property('type');",
+							"    pm.expect(account).to.have.property('createdAt');",
+							"});",
+							"",
+							"pm.test('Store accountId for later use', function () {",
+							"    const account = pm.response.json().account;",
+							"    pm.collectionVariables.set('accountId', account.id);",
+							"});"
+						]
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [
@@ -47,6 +78,38 @@
 		},
 		{
 			"name": "Get Account",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test('Response has account object and balance', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('account');",
+							"    pm.expect(jsonData).to.have.property('balance');",
+							"});",
+							"",
+							"pm.test('Account has required fields', function () {",
+							"    const account = pm.response.json().account;",
+							"    pm.expect(account).to.have.property('id');",
+							"    pm.expect(account).to.have.property('userId');",
+							"    pm.expect(account).to.have.property('type');",
+							"    pm.expect(account).to.have.property('createdAt');",
+							"});",
+							"",
+							"pm.test('Balance is a number', function () {",
+							"    const balance = pm.response.json().balance;",
+							"    pm.expect(balance).to.be.a('number');",
+							"});"
+						]
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -73,6 +136,25 @@
 		},
 		{
 			"name": "List Accounts",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test('Response has accounts array', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('accounts');",
+							"    pm.expect(jsonData.accounts).to.be.an('array');",
+							"});"
+						]
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
@@ -98,6 +180,30 @@
 		},
 		{
 			"name": "Credit Account",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test('Response has accountId and balance', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('accountId');",
+							"    pm.expect(jsonData).to.have.property('balance');",
+							"});",
+							"",
+							"pm.test('Balance is a number', function () {",
+							"    const balance = pm.response.json().balance;",
+							"    pm.expect(balance).to.be.a('number');",
+							"});"
+						]
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [
@@ -139,6 +245,42 @@
 		},
 		{
 			"name": "Onboard User",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('Status code is 201', function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"pm.test('Response has user, account, assignment, and balance', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('user');",
+							"    pm.expect(jsonData).to.have.property('account');",
+							"    pm.expect(jsonData).to.have.property('assignment');",
+							"    pm.expect(jsonData).to.have.property('balance');",
+							"});",
+							"",
+							"pm.test('User has required fields', function () {",
+							"    const user = pm.response.json().user;",
+							"    pm.expect(user).to.have.property('id');",
+							"    pm.expect(user).to.have.property('name');",
+							"    pm.expect(user).to.have.property('email');",
+							"});",
+							"",
+							"pm.test('Account has required fields', function () {",
+							"    const account = pm.response.json().account;",
+							"    pm.expect(account).to.have.property('id');",
+							"    pm.expect(account).to.have.property('userId');",
+							"    pm.expect(account).to.have.property('type');",
+							"    pm.expect(account).to.have.property('createdAt');",
+							"});"
+						]
+					}
+				}
+			],
 			"request": {
 				"method": "POST",
 				"header": [
@@ -172,6 +314,29 @@
 		},
 		{
 			"name": "Health Check",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test('Status code is 200', function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test('Response has status ok', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.equal('ok');",
+							"});",
+							"",
+							"pm.test('Service is accounts-api', function () {",
+							"    const jsonData = pm.response.json();",
+							"    pm.expect(jsonData.service).to.equal('accounts-api');",
+							"});"
+						]
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],
