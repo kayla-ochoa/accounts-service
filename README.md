@@ -76,6 +76,13 @@ export POSTMAN_API_KEY="PMAK_xxxxx"
 export IDENTITY_PROJECT_ID="svc_identity"
 export ACCOUNTS_PROJECT_ID="svc_accounts"
 export CATALOG_PROJECT_ID="svc_catalog"
+
+export IDENTITY_WORKSPACE_ID="uuid-identity"
+export ACCOUNTS_WORKSPACE_ID="uuid-accounts"
+export CATALOG_WORKSPACE_ID="uuid-catalog"
+
+export POSTMAN_SYSTEM_ENV="uuid-system-env"
+
 ```
 
 ---

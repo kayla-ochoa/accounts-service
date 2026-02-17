@@ -114,9 +114,13 @@ render_apply() {
 
   sed \
     -e "s|__POSTMAN_API_KEY__|${POSTMAN_API_KEY}|g" \
+    -e "s|__POSTMAN_SYSTEM_ENV__|${POSTMAN_SYSTEM_ENV}|g" \
     -e "s|__IDENTITY_PROJECT_ID__|${IDENTITY_PROJECT_ID}|g" \
     -e "s|__ACCOUNTS_PROJECT_ID__|${ACCOUNTS_PROJECT_ID}|g" \
     -e "s|__CATALOG_PROJECT_ID__|${CATALOG_PROJECT_ID}|g" \
+    -e "s|__IDENTITY_WORKSPACE_ID__|${IDENTITY_WORKSPACE_ID}|g" \
+    -e "s|__ACCOUNTS_WORKSPACE_ID__|${ACCOUNTS_WORKSPACE_ID}|g" \
+    -e "s|__CATALOG_WORKSPACE_ID__|${CATALOG_WORKSPACE_ID}|g" \
     "${in_file}" > "${out_file}"
 
   kubectl apply -f "${out_file}"
